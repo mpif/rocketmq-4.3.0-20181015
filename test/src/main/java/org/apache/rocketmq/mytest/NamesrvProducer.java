@@ -15,14 +15,16 @@ import org.apache.rocketmq.remoting.exception.RemotingException;
  */
 public class NamesrvProducer {
 
-    private final String producerGroup = "";
-    private final String namesrvAddr = "";
-    private final String topic = "";
+    private final String producerGroup = "brokerProducerGroupName";
+    private final String namesrvAddr = "192.168.199.159:9876";
+    private final String topic = "mycreateTopic";
     private final String tags = "";
 
     private final int retryTimes = 3;
-    private final String instanceName = "leMacLocalNamesrvProducer";
-    private final String clientIP = "10.75.164.61";
+//    private final String instanceName = "leMacLocalNamesrvProducer";
+//    private final String clientIP = "10.75.164.61";
+    private final String instanceName = null;
+    private final String clientIP = null;
 
     private final String produceMsgContent = "hello namesrv produce message...";
 
@@ -81,6 +83,12 @@ public class NamesrvProducer {
 
                 sendResult = defaultProducer.send(mqMsg);
                 System.out.println(sendResult);
+
+                if(SendStatus.SEND_OK.equals(sendResult.getSendStatus())) {
+                    System.out.println("消息发送成功.");
+                    defaultProducer.shutdown();
+                    System.out.println("生产者关闭.");
+                }
 
                 // 如果消息没有发送成功，再发送两次
                 if (!SendStatus.SEND_OK.equals(sendResult.getSendStatus())) {

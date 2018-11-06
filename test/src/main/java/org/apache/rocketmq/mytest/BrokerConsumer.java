@@ -16,10 +16,10 @@ import java.util.concurrent.TimeUnit;
  */
 public class BrokerConsumer {
 
-    private String consumerGroup = "";
-    private String namesrvAddr = "";
-    private String topic = "";
-    private String tags = "";
+    private String consumerGroup = "brokerProducerGroupName";
+    private String namesrvAddr = "192.168.199.159:9876";
+    private String topic = "mycreateTopic";
+    private String tags = "brokerProducerTagsName";
 
     private int batchMaxSize = 0;
 

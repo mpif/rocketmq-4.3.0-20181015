@@ -18,7 +18,7 @@ public class BrokerMessageListenerOrderly implements MessageListenerOrderly {
     public ConsumeOrderlyStatus consumeMessage(List<MessageExt> msgs, ConsumeOrderlyContext context) {
         for (MessageExt msg : msgs) {
             String msgStr = new String(msg.getBody(), Charset.forName("UTF-8"));
-            System.out.println(msgStr);
+            System.out.println("BrokerMessageListenerOrderly, " + msgStr);
         }
         return ConsumeOrderlyStatus.SUCCESS;
     }

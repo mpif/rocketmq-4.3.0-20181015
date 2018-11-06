@@ -19,7 +19,7 @@ public class NamesrvMessageListenerConcurrently implements MessageListenerConcur
     public ConsumeConcurrentlyStatus consumeMessage(List<MessageExt> msgs, ConsumeConcurrentlyContext context) {
         for (MessageExt msg : msgs) {
             String msgStr = new String(msg.getBody(), Charset.forName("UTF-8"));
-            System.out.println(msgStr);
+            System.out.println("NamesrvMessageListenerConcurrently, " + msgStr);
         }
         return ConsumeConcurrentlyStatus.CONSUME_SUCCESS;
     }
