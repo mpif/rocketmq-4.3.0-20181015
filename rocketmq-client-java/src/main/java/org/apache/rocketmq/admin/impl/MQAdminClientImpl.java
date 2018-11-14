@@ -1,6 +1,6 @@
 package org.apache.rocketmq.admin.impl;
 
-import org.apache.rocketmq.admin.MQClusterAdmin;
+import org.apache.rocketmq.admin.MQAdminClient;
 import org.apache.rocketmq.common.MixAll;
 import org.apache.rocketmq.common.protocol.body.ClusterInfo;
 import org.apache.rocketmq.common.protocol.body.KVTable;
@@ -17,11 +17,11 @@ import java.util.TreeSet;
  * @Date: 2018-11-14 5:36
  */
 
-public class MQClusterAdminImpl implements MQClusterAdmin {
+public class MQAdminClientImpl implements MQAdminClient {
 
     private String namesrvAddr;
 
-    public MQClusterAdminImpl(String namesrvAddr) {
+    public MQAdminClientImpl(String namesrvAddr) {
         this.namesrvAddr = namesrvAddr;
         System.setProperty(MixAll.NAMESRV_ADDR_PROPERTY, namesrvAddr);
     }

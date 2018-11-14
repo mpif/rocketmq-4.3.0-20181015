@@ -13,7 +13,6 @@ The most commonly used mqadmin commands are:
    queryMsgByKey        Query Message by Key
    queryMsgByUniqueKey  Query Message by Unique key
    queryMsgByOffset     Query Message by offset
-   queryMsgByUniqueKey  Query Message by Unique key
    printMsg             Print Message Detail
    sendMsgStatus        Send msg to broker.
    brokerConsumeStats   Fetch broker consume stats data

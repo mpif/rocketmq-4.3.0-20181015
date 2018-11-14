@@ -1,6 +1,6 @@
 package org.apache.rocketmq.admin;
 
-import org.apache.rocketmq.admin.impl.MQClusterAdminImpl;
+import org.apache.rocketmq.admin.impl.MQAdminClientImpl;
 import org.junit.Before;
 import org.junit.Test;
 
@@ -9,15 +9,15 @@ import org.junit.Test;
  * @Date: 2018-11-14 5:36
  */
 
-public class MQClusterAdminTest {
+public class MQAdminClientTest {
 
     private String namesrvAddr;
-    private MQClusterAdmin mqClusterAdmin;
+    private MQAdminClient mqClusterAdmin;
 
     @Before
     public void before() {
         namesrvAddr = "192.168.199.159:9876";
-        mqClusterAdmin = new MQClusterAdminImpl(namesrvAddr);
+        mqClusterAdmin = new MQAdminClientImpl(namesrvAddr);
     }
 
     @Test
