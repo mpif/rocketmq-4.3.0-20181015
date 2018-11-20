@@ -1,10 +1,16 @@
 package org.apache.rocketmq.admin.impl;
 
 import org.apache.rocketmq.admin.MQAdminClient;
+import org.apache.rocketmq.client.exception.MQBrokerException;
+import org.apache.rocketmq.client.exception.MQClientException;
 import org.apache.rocketmq.common.MixAll;
+import org.apache.rocketmq.common.UtilAll;
 import org.apache.rocketmq.common.protocol.body.ClusterInfo;
+import org.apache.rocketmq.common.protocol.body.GroupList;
 import org.apache.rocketmq.common.protocol.body.KVTable;
+import org.apache.rocketmq.common.protocol.body.TopicList;
 import org.apache.rocketmq.common.protocol.route.BrokerData;
+import org.apache.rocketmq.remoting.exception.RemotingException;
 import org.apache.rocketmq.tools.admin.DefaultMQAdminExt;
 
 import java.util.Iterator;
@@ -21,20 +27,30 @@ public class MQAdminClientImpl implements MQAdminClient {
 
     private String namesrvAddr;
 
+    private DefaultMQAdminExt defaultMQAdminExt;
+
     public MQAdminClientImpl(String namesrvAddr) {
         this.namesrvAddr = namesrvAddr;
         System.setProperty(MixAll.NAMESRV_ADDR_PROPERTY, namesrvAddr);
+
+        try {
+            defaultMQAdminExt = new DefaultMQAdminExt();
+            defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
+            defaultMQAdminExt.start();
+        } catch (MQClientException e) {
+            e.printStackTrace();
+        }
+
     }
 
     @Override
     public void clusterList() {
 
-        DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
-
-        defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
+//        DefaultMQAdminExt defaultMQAdminExt = new DefaultMQAdminExt();
+//        defaultMQAdminExt.setInstanceName(Long.toString(System.currentTimeMillis()));
 
         try {
-            defaultMQAdminExt.start();
+//            defaultMQAdminExt.start();
 
             ClusterInfo clusterInfoSerializeWrapper = defaultMQAdminExt.examineBrokerClusterInfo();
 
@@ -177,6 +193,191 @@ public class MQAdminClientImpl implements MQAdminClient {
         }
     }
 
+    @Override
+    public void topicClusterList(String topic) {
+
+        try {
+
+            Set<String> clusters = defaultMQAdminExt.getTopicClusterList(topic);
+            for (String value : clusters) {
+                System.out.printf("%s%n", value);
+            }
+
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (MQBrokerException e) {
+            e.printStackTrace();
+        } catch (MQClientException e) {
+            e.printStackTrace();
+        } catch (RemotingException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void brokerStatus() {
+
+    }
+
+    @Override
+    public void brokerConsumeStats() {
+
+    }
+
+    @Override
+    public void consumerProgress() {
+
+    }
+
+    @Override
+    public void producerConnection() {
+
+    }
+
+    @Override
+    public void consumerConnection() {
+
+    }
+
+    @Override
+    public void consumerStatus() {
+
+    }
+
+    @Override
+    public void cloneGroupOffset() {
+
+    }
+
+    @Override
+    public void statsAll() {
+
+    }
+
+    @Override
+    public void topicList() {
+
+        try {
+//
+//            if (commandLine.hasOption('c')) {
+//                ClusterInfo clusterInfo = defaultMQAdminExt.examineBrokerClusterInfo();
+//
+//                System.out.printf("%-20s  %-48s  %-48s%n",
+//                        "#Cluster Name",
+//                        "#Topic",
+//                        "#Consumer Group"
+//                );
+//
+//                TopicList topicList = defaultMQAdminExt.fetchAllTopicList();
+//                for (String topic : topicList.getTopicList()) {
+//                    if (topic.startsWith(MixAll.RETRY_GROUP_TOPIC_PREFIX)
+//                            || topic.startsWith(MixAll.DLQ_GROUP_TOPIC_PREFIX)) {
+//                        continue;
+//                    }
+//
+//                    String clusterName = "";
+//                    GroupList groupList = new GroupList();
+//
+//                    try {
+//                        clusterName =
+//                                this.findTopicBelongToWhichCluster(topic, clusterInfo, defaultMQAdminExt);
+//                        groupList = defaultMQAdminExt.queryTopicConsumeByWho(topic);
+//                    } catch (Exception e) {
+//                    }
+//
+//                    if (null == groupList || groupList.getGroupList().isEmpty()) {
+//                        groupList = new GroupList();
+//                        groupList.getGroupList().add("");
+//                    }
+//
+//                    for (String group : groupList.getGroupList()) {
+//                        System.out.printf("%-20s  %-48s  %-48s%n",
+//                                UtilAll.frontStringAtLeast(clusterName, 20),
+//                                UtilAll.frontStringAtLeast(topic, 48),
+//                                UtilAll.frontStringAtLeast(group, 48)
+//                        );
+//                    }
+//                }
+//            } else {
+                TopicList topicList = defaultMQAdminExt.fetchAllTopicList();
+                for (String topic : topicList.getTopicList()) {
+                    System.out.printf("%s%n", topic);
+                }
+//            }
+
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void topicRoute() {
+
+    }
+
+    @Override
+    public void topicStatus() {
+
+    }
+
+    @Override
+    public void queryMsgById() {
+
+    }
+
+    @Override
+    public void queryMsgByKey() {
+
+    }
+
+    @Override
+    public void queryMsgByUniqueKey() {
+
+    }
+
+    @Override
+    public void queryMsgByOffset() {
+
+    }
+
+    @Override
+    public void printMsg() {
+
+    }
+
+    @Override
+    public void sendMsgStatus() {
+
+    }
+
+    @Override
+    public void startMonitoring() {
+
+    }
+
+    @Override
+    public void syncDocs() {
+
+    }
+
+    @Override
+    public void allocateMQ() {
+
+    }
+
+    @Override
+    public void checkMsgSendRT() {
+
+    }
+
+    @Override
+    public void clusterRT() {
+
+    }
 
 
 }

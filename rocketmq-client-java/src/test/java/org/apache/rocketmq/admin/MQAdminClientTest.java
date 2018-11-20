@@ -16,7 +16,7 @@ public class MQAdminClientTest {
 
     @Before
     public void before() {
-        namesrvAddr = "192.168.199.159:9876";
+        namesrvAddr = "localhost:9876";
         mqClusterAdmin = new MQAdminClientImpl(namesrvAddr);
     }
 
@@ -27,5 +27,15 @@ public class MQAdminClientTest {
 
     }
 
+    @Test
+    public void topicListTest() {
+        mqClusterAdmin.topicList();
+    }
+
+    @Test
+    public void topicClusterListTest() {
+        String topic = "namesrvProducerTopic";
+        mqClusterAdmin.topicClusterList(topic);
+    }
 
 }

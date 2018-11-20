@@ -14,7 +14,7 @@ public interface MQAdminClient {
     /**
      * Get cluster info for topic
      */
-    public void topicClusterList();
+    public void topicClusterList(String topic);
 
     /**
      * Fetch broker runtime status data
