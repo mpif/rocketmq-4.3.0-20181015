@@ -8,7 +8,7 @@ import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.remoting.exception.RemotingException;
 
 /**
- * @author: ShengzhiCai
+ * @author: codefans
  * @date: 2018-10-25 09:00
  * 直连broker,并生产消息
  */

@@ -10,7 +10,7 @@ import org.apache.rocketmq.common.consumer.ConsumeFromWhere;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author: ShengzhiCai
+ * @author: codefans
  * @date: 2018-10-25 09:00
  * 直连broker,并消费消息
  */

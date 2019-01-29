@@ -10,7 +10,7 @@ import java.nio.charset.Charset;
 import java.util.List;
 
 /**
- * @author: ShengzhiCai
+ * @author: codefans
  * @date: 2018-10-25 09:52
  */
 public class BrokerMessageListenerOrderly implements MessageListenerOrderly {

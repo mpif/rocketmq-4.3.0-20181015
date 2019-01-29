@@ -3,23 +3,21 @@ package org.apache.rocketmq.admin.impl;
 import org.apache.rocketmq.admin.MQAdminClient;
 import org.apache.rocketmq.client.exception.MQBrokerException;
 import org.apache.rocketmq.client.exception.MQClientException;
+import org.apache.rocketmq.common.MQVersion;
 import org.apache.rocketmq.common.MixAll;
 import org.apache.rocketmq.common.UtilAll;
-import org.apache.rocketmq.common.protocol.body.ClusterInfo;
-import org.apache.rocketmq.common.protocol.body.GroupList;
-import org.apache.rocketmq.common.protocol.body.KVTable;
-import org.apache.rocketmq.common.protocol.body.TopicList;
+import org.apache.rocketmq.common.protocol.body.*;
 import org.apache.rocketmq.common.protocol.route.BrokerData;
+import org.apache.rocketmq.remoting.exception.RemotingConnectException;
 import org.apache.rocketmq.remoting.exception.RemotingException;
+import org.apache.rocketmq.remoting.exception.RemotingSendRequestException;
+import org.apache.rocketmq.remoting.exception.RemotingTimeoutException;
 import org.apache.rocketmq.tools.admin.DefaultMQAdminExt;
 
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import java.util.*;
 
 /**
- * @Author: ShengzhiCai
+ * @Author: codefans
  * @Date: 2018-11-14 5:36
  */
 
@@ -216,7 +214,39 @@ public class MQAdminClientImpl implements MQAdminClient {
     }
 
     @Override
-    public void brokerStatus() {
+    public void brokerStatus(String brokerAddr) {
+
+        try {
+            KVTable kvTable = defaultMQAdminExt.fetchBrokerRuntimeStats(brokerAddr);
+
+            TreeMap<String, String> tmp = new TreeMap<String, String>();
+            tmp.putAll(kvTable.getTable());
+
+            Iterator<Map.Entry<String, String>> it = tmp.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry<String, String> next = it.next();
+    //            if (printBroker) {
+                    System.out.printf("%-24s %-32s: %s%n", brokerAddr, next.getKey(), next.getValue());
+    //            } else {
+    //                System.out.printf("%-32s: %s%n", next.getKey(), next.getValue());
+    //            }
+            }
+        } catch (RemotingConnectException e) {
+            e.printStackTrace();
+        } catch (RemotingSendRequestException e) {
+            e.printStackTrace();
+        } catch (RemotingTimeoutException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (MQBrokerException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    @Override
+    public void queryTopicConsumeByWho() {
 
     }
 
@@ -232,6 +262,33 @@ public class MQAdminClientImpl implements MQAdminClient {
 
     @Override
     public void producerConnection() {
+
+        try {
+            int i = 1;
+
+            String group = "";
+            String topic = "namesrvProducerTopic";
+
+            ProducerConnection pc = defaultMQAdminExt.examineProducerConnectionInfo(group, topic);
+
+            for (Connection conn : pc.getConnectionSet()) {
+                System.out.printf("%04d  %-32s %-22s %-8s %s%n",
+                        i++,
+                        conn.getClientId(),
+                        conn.getClientAddr(),
+                        conn.getLanguage(),
+                        MQVersion.getVersionDesc(conn.getVersion())
+                );
+            }
+        } catch (RemotingException e) {
+            e.printStackTrace();
+        } catch (MQClientException e) {
+            e.printStackTrace();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        } catch (MQBrokerException e) {
+            e.printStackTrace();
+        }
 
     }
 

@@ -11,15 +11,15 @@ import org.apache.rocketmq.common.consumer.ConsumeFromWhere;
 import java.util.concurrent.TimeUnit;
 
 /**
- * @author: ShengzhiCai
+ * @author: codefans
  * @date: 2018-10-25 09:00
  * 直连namesrv,并消费消息
  */
 public class NamesrvConsumer {
 
     private String consumerGroup = "brokerProducerGroupName";
-    private String namesrvAddr = "192.168.199.159:9876";
-    private String topic = "mycreateTopic";
+    private String namesrvAddr = "localhost:9876";
+    private String topic = "namesrvProducerTopic";
 //    private String tags = "namesrvProducerTagsName";
     private String tags = null;
 

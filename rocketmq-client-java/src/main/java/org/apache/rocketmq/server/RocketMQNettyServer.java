@@ -25,12 +25,13 @@ import org.apache.rocketmq.remoting.protocol.RemotingSysResponseCode;
 import java.net.InetSocketAddress;
 import java.util.NoSuchElementException;
 import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.RejectedExecutionException;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * @author: ShengzhiCai
+ * @author: codefans
  * @date: 2018-11-20 18:40
  */
 public class RocketMQNettyServer {
@@ -46,8 +47,11 @@ public class RocketMQNettyServer {
 
         try {
 
-            int serverListenPort = 9876;
-
+            int serverListenPort = 3456;
+            int socketSndbufSize = 65535;
+            int socketRcvbufSize = 65535;
+            final int serverChannelMaxIdleTimeSeconds = 120;
+            final String HANDSHAKE_HANDLER_NAME = "handshakeHandler";
 
             int serverWorkerThreadCount = Runtime.getRuntime().availableProcessors();
             final int serverSelectorThreadCount = serverWorkerThreadCount;
@@ -82,11 +86,6 @@ public class RocketMQNettyServer {
                     return new Thread(r, String.format("NettyServerNIOSelector_%d_%d", threadTotal, this.threadIndex.incrementAndGet()));
                 }
             });
-
-            int socketSndbufSize = 65535;
-            int socketRcvbufSize = 65535;
-            final int serverChannelMaxIdleTimeSeconds = 120;
-            final String HANDSHAKE_HANDLER_NAME = "handshakeHandler";
 
             ServerBootstrap childHandler =
                     serverBootstrap.group(eventLoopGroupBoss, eventLoopGroupSelector)
@@ -303,88 +302,11 @@ public class RocketMQNettyServer {
          * @param cmd request command.
          */
         public void processRequestCommand(final ChannelHandlerContext ctx, final RemotingCommand cmd) {
-            final Pair<NettyRequestProcessor, ExecutorService> matched = this.processorTable.get(cmd.getCode());
-            final Pair<NettyRequestProcessor, ExecutorService> pair = null == matched ? this.defaultRequestProcessor : matched;
-            final int opaque = cmd.getOpaque();
-
-            if (pair != null) {
-                Runnable run = new Runnable() {
-                    @Override
-                    public void run() {
-                        try {
-                            RPCHook rpcHook = NettyRemotingAbstract.this.getRPCHook();
-                            if (rpcHook != null) {
-                                rpcHook.doBeforeRequest(RemotingHelper.parseChannelRemoteAddr(ctx.channel()), cmd);
-                            }
-
-                            final RemotingCommand response = pair.getObject1().processRequest(ctx, cmd);
-                            if (rpcHook != null) {
-                                rpcHook.doAfterResponse(RemotingHelper.parseChannelRemoteAddr(ctx.channel()), cmd, response);
-                            }
-
-                            if (!cmd.isOnewayRPC()) {
-                                if (response != null) {
-                                    response.setOpaque(opaque);
-                                    response.markResponseType();
-                                    try {
-                                        ctx.writeAndFlush(response);
-                                    } catch (Throwable e) {
-                                        System.out.println("process request over, but response failed" + e);
-                                        System.out.println(cmd.toString());
-                                        System.out.println(response.toString());
-                                    }
-                                } else {
-
-                                }
-                            }
-                        } catch (Throwable e) {
-                            System.out.println("process request exception" + e);
-                            System.out.println(cmd.toString());
-
-                            if (!cmd.isOnewayRPC()) {
-                                final RemotingCommand response = RemotingCommand.createResponseCommand(RemotingSysResponseCode.SYSTEM_ERROR,
-                                        RemotingHelper.exceptionSimpleDesc(e));
-                                response.setOpaque(opaque);
-                                ctx.writeAndFlush(response);
-                            }
-                        }
-                    }
-                };
-
-                if (pair.getObject1().rejectRequest()) {
-                    final RemotingCommand response = RemotingCommand.createResponseCommand(RemotingSysResponseCode.SYSTEM_BUSY,
-                            "[REJECTREQUEST]system busy, start flow control for a while");
-                    response.setOpaque(opaque);
-                    ctx.writeAndFlush(response);
-                    return;
-                }
-
-                try {
-                    final RequestTask requestTask = new RequestTask(run, ctx.channel(), cmd);
-                    pair.getObject2().submit(requestTask);
-                } catch (RejectedExecutionException e) {
-                    if ((System.currentTimeMillis() % 10000) == 0) {
-                        System.out.println(RemotingHelper.parseChannelRemoteAddr(ctx.channel())
-                                + ", too many requests and system thread pool busy, RejectedExecutionException "
-                                + pair.getObject2().toString()
-                                + " request code: " + cmd.getCode());
-                    }
-
-                    if (!cmd.isOnewayRPC()) {
-                        final RemotingCommand response = RemotingCommand.createResponseCommand(RemotingSysResponseCode.SYSTEM_BUSY,
-                                "[OVERLOAD]system busy, start flow control for a while");
-                        response.setOpaque(opaque);
-                        ctx.writeAndFlush(response);
-                    }
-                }
-            } else {
-                String error = " request type " + cmd.getCode() + " not supported";
-                final RemotingCommand response =
-                        RemotingCommand.createResponseCommand(RemotingSysResponseCode.REQUEST_CODE_NOT_SUPPORTED, error);
-                response.setOpaque(opaque);
-                ctx.writeAndFlush(response);
-                System.out.println(RemotingHelper.parseChannelRemoteAddr(ctx.channel()) + error);
-            }
+            String error = " request type " + cmd.getCode() + " not supported";
+            final RemotingCommand response =
+                    RemotingCommand.createResponseCommand(RemotingSysResponseCode.REQUEST_CODE_NOT_SUPPORTED, error);
+            ctx.writeAndFlush(response);
+            System.out.println(RemotingHelper.parseChannelRemoteAddr(ctx.channel()) + error);
         }
 
         /**
@@ -395,22 +317,26 @@ public class RocketMQNettyServer {
          */
         public void processResponseCommand(ChannelHandlerContext ctx, RemotingCommand cmd) {
             final int opaque = cmd.getOpaque();
-            final ResponseFuture responseFuture = responseTable.get(opaque);
-            if (responseFuture != null) {
-                responseFuture.setResponseCommand(cmd);
 
-                responseTable.remove(opaque);
+            System.out.println("processResponseCommand--->");
+            System.out.println(cmd);
 
-                if (responseFuture.getInvokeCallback() != null) {
-                    executeInvokeCallback(responseFuture);
-                } else {
-                    responseFuture.putResponse(cmd);
-                    responseFuture.release();
-                }
-            } else {
-                System.out.println("receive response, but not matched any request, " + RemotingHelper.parseChannelRemoteAddr(ctx.channel()));
-                System.out.println(cmd.toString());
-            }
+//            final ResponseFuture responseFuture = responseTable.get(opaque);
+//            if (responseFuture != null) {
+//                responseFuture.setResponseCommand(cmd);
+//
+//                responseTable.remove(opaque);
+//
+//                if (responseFuture.getInvokeCallback() != null) {
+//                    executeInvokeCallback(responseFuture);
+//                } else {
+//                    responseFuture.putResponse(cmd);
+//                    responseFuture.release();
+//                }
+//            } else {
+//                System.out.println("receive response, but not matched any request, " + RemotingHelper.parseChannelRemoteAddr(ctx.channel()));
+//                System.out.println(cmd.toString());
+//            }
         }
 
         /**
@@ -418,7 +344,16 @@ public class RocketMQNettyServer {
          */
         private void executeInvokeCallback(final ResponseFuture responseFuture) {
             boolean runInThisThread = false;
-            ExecutorService executor = this.getCallbackExecutor();
+
+            ExecutorService executor = Executors.newFixedThreadPool(4, new ThreadFactory() {
+                private AtomicInteger threadIndex = new AtomicInteger(0);
+
+                @Override
+                public Thread newThread(Runnable r) {
+                    return new Thread(r, "NettyServerPublicExecutor_" + this.threadIndex.incrementAndGet());
+                }
+            });
+
             if (executor != null) {
                 try {
                     executor.submit(new Runnable() {

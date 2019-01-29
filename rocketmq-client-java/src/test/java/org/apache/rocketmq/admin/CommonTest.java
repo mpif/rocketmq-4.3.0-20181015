@@ -3,7 +3,7 @@ package org.apache.rocketmq.admin;
 import org.junit.Test;
 
 /**
- * @Author: ShengzhiCai
+ * @Author: codefans
  * @Date: 2018-11-14 6:40
  */
 

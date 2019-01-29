@@ -1,7 +1,7 @@
 package org.apache.rocketmq.admin;
 
 /**
- * @Author: ShengzhiCai
+ * @Author: codefans
  * @Date: 2018-11-14 5:35
  */
 public interface MQAdminClient {
@@ -19,7 +19,9 @@ public interface MQAdminClient {
     /**
      * Fetch broker runtime status data
      */
-    public void brokerStatus();
+    public void brokerStatus(String brokerAddr);
+
+    public void queryTopicConsumeByWho();
 
     /**
      * Fetch broker consume stats data

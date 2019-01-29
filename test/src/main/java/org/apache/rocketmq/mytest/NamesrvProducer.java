@@ -9,15 +9,15 @@ import org.apache.rocketmq.common.message.Message;
 import org.apache.rocketmq.remoting.exception.RemotingException;
 
 /**
- * @author: ShengzhiCai
+ * @author: codefans
  * @date: 2018-10-25 09:00
  * 直连namesrv,并生产消息
  */
 public class NamesrvProducer {
 
     private final String producerGroup = "brokerProducerGroupName";
-    private final String namesrvAddr = "192.168.199.159:9876";
-    private final String topic = "mycreateTopic";
+    private final String namesrvAddr = "localhost:9876";
+    private final String topic = "namesrvProducerTopic";
     private final String tags = "";
 
     private final int retryTimes = 3;

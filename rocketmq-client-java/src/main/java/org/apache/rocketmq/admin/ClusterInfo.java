@@ -1,7 +1,7 @@
 package org.apache.rocketmq.admin;
 
 /**
- * @Author: ShengzhiCai
+ * @Author: codefans
  * @Date: 2018-11-14 6:50
  */
 

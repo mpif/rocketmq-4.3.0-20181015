@@ -12,7 +12,7 @@ import java.net.SocketAddress;
 import static org.apache.rocketmq.client.util.RemotingUtil.closeChannel;
 
 /**
- * @Author: ShengzhiCai
+ * @Author: codefans
  * @Date: 2018-11-06 23:29
  */
 

@@ -7,7 +7,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 
 /**
- * @author: ShengzhiCai
+ * @author: codefans
  * @date: 2018-11-05 10:12
  */
 public class ProducerJavaClient {

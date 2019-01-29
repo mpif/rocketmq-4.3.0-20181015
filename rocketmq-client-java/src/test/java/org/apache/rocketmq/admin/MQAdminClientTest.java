@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
- * @Author: ShengzhiCai
+ * @Author: codefans
  * @Date: 2018-11-14 5:36
  */
 
@@ -36,6 +36,17 @@ public class MQAdminClientTest {
     public void topicClusterListTest() {
         String topic = "namesrvProducerTopic";
         mqClusterAdmin.topicClusterList(topic);
+    }
+
+    @Test
+    public void producerConnectionTest() {
+        mqClusterAdmin.producerConnection();
+    }
+
+    @Test
+    public void brokerStatusTest() {
+        String brokerAddr = "10.75.164.61:10911";
+        mqClusterAdmin.brokerStatus(brokerAddr);
     }
 
 }

@@ -1,7 +1,7 @@
 package org.apache.rocketmq.client;
 
 /**
- * @Author: ShengzhiCai
+ * @Author: codefans
  * @Date: 2018-11-03 21:41
  * json格式的header
  */
